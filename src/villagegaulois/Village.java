@@ -8,7 +8,7 @@ public class Village {
     private Chef chef;
     private Gaulois[] villageois;
     private int nbVillageois = 0;
-    private Marche marche; // Ne pas oublier de déclarer l'attribut marche !
+    private Marche marche;
 
     public Village(String nom, int nbVillageoisMaximum, int nbEtals) {
         this.nom = nom;
@@ -43,19 +43,25 @@ public class Village {
         return null;
     }
 
-    public String afficherVillageois() {
-        String chaine = "Au village du chef " + chef.getNom() + " vivent les légendaires gaulois :\n";
+
+    public String afficherVillageois() throws VillageSansChefException {
+       
+        if (chef == null) {
+            throw new VillageSansChefException("Le village ne peut pas exister sans chef !");
+        }
+
         if (nbVillageois < 1) {
             return "Il n'y a encore aucun habitant au village du chef " + chef.getNom() + ".\n";
         }
+
+        String chaine = "Au village du chef " + chef.getNom() + " vivent les légendaires gaulois :\n";
         for (int i = 0; i < nbVillageois; i++) {
             chaine += "- " + villageois[i].getNom() + "\n";
         }
         return chaine;
     }
 
-    // --- MÉTHODES DE VILLAGE UTILISANT LE MARCHÉ ---
-
+ 
     public String installerVendeur(Gaulois vendeur, String produit, int nbProduit) {
         String message = vendeur.getNom() + " cherche un endroit pour vendre " + nbProduit + " " + produit + ".\n";
         int indice = marche.trouverEtalLibre();
@@ -92,18 +98,15 @@ public class Village {
         if (etal == null) {
             return vendeur.getNom() + " n'a pas d'étal à quitter.";
         }
-        int vendus = etal.nbProduitInitial() - etal.nbProduitRestant();
-        etal.libererEtal();
-        return "Le vendeur " + vendeur.getNom() + " quitte son étal, il a vendu "
-                + vendus + " " + etal.getProduit() + " parmi les "
-                + etal.nbProduitInitial() + " qu'il voulait vendre.";
+        
+       
+        return etal.libererEtal();
     }
 
     public String afficherMarche() {
         return "Le marché du village \"" + nom + "\" possède plusieurs étals :\n" + marche.afficherMarche();
     }
 
-    // --- CLASSE INTERNE MARCHE ---
 
     private class Marche {
         private Etal[] etals;
